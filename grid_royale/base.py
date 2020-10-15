@@ -685,8 +685,7 @@ class SimpleStrategy(_GridRoyaleStrategy):
         self.epsilon = epsilon
 
 
-    def decide_action_for_observation(self, observation: Observation,
-                                       extra: Any = None) -> Action:
+    def decide_action_for_observation(self, observation: Observation) -> Action:
         if random.random() <= self.epsilon or not observation.state.food_positions:
             return random.choice(observation.legal_actions)
         else:

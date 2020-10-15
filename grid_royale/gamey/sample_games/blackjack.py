@@ -169,15 +169,13 @@ class BlackjackStrategy(gamey.SinglePlayerStrategy):
 
 
 class AlwaysHitStrategy(BlackjackStrategy):
-    def decide_action_for_observation(self, observation: BlackjackState,
-                                       extra: Any = None) -> BlackjackAction:
+    def decide_action_for_observation(self, observation: BlackjackState) -> BlackjackAction:
         return (BlackjackAction.hit if (BlackjackAction.hit in observation.legal_actions)
                 else BlackjackAction.wait)
 
 class AlwaysStickStrategy(BlackjackStrategy):
     '''A strategy that always sticks, no matter what.'''
-    def decide_action_for_observation(self, observation: BlackjackState,
-                                       extra: Any = None) -> BlackjackAction:
+    def decide_action_for_observation(self, observation: BlackjackState) -> BlackjackAction:
         return (BlackjackAction.stick if (BlackjackAction.stick in observation.legal_actions)
                 else BlackjackAction.wait)
 
@@ -188,8 +186,7 @@ class ThresholdStrategy(BlackjackStrategy):
     def __init__(self, threshold: int = 17) -> None:
         self.threshold = threshold
 
-    def decide_action_for_observation(self, observation: BlackjackState,
-                                       extra: Any = None) -> BlackjackAction:
+    def decide_action_for_observation(self, observation: BlackjackState) -> BlackjackAction:
         if BlackjackAction.wait in observation.legal_actions:
             return BlackjackAction.wait
         elif observation.player_sum >= self.threshold:

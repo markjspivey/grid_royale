@@ -33,15 +33,14 @@ from . import utils
 class Strategy(abc.ABC):
     '''
     Logic for deciding which action to take in a given observation.
-   
+
     Your fancy machine-learning code goes here.
     '''
 
     State: Type[State]
 
     @abc.abstractmethod
-    def decide_action_for_observation(self, observation: Observation,
-                                       extra: Any = None) -> Action:
+    def decide_action_for_observation(self, observation: Observation) -> Action:
         raise NotImplementedError
 
     def __repr__(self) -> str:
@@ -70,8 +69,7 @@ class SinglePlayerStrategy(Strategy):
 
 
 class RandomStrategy(Strategy):
-    def decide_action_for_observation(self, observation: Observation, *,
-                                       extra: Any = None) -> Action:
+    def decide_action_for_observation(self, observation: Observation) -> Action:
         return random.choice(observation.legal_actions)
 
 
