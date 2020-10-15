@@ -8,6 +8,7 @@ import concurrent.futures
 import numbers
 from typing import (Iterable, Union, Optional, Tuple, Any, Iterator, Type,
                     Sequence, Callable)
+import weakref
 
 import keras.models
 import numpy as np
@@ -106,6 +107,7 @@ class ModelFreeLearningStrategy(QStrategy):
         self.model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
         self.training_batch_size = training_batch_size
         self.training_data = TrainingData(self)
+        self.q_map_cache = weakref.WeakKeyDictionary()
 
 
 
@@ -198,7 +200,10 @@ class ModelFreeLearningStrategy(QStrategy):
         if 0 < epsilon > random.random(): # Clever shortcut-logic optimization.
             return random.choice(observation.legal_actions)
         else:
-            q_map = self.get_qs_for_observation(observation)
+            try:
+                q_map = self.q_map_cache[observation]
+            except KeyError:
+                q_map = self.q_map_cache[observation] = self.get_qs_for_observation(observation)
             return max(q_map, key=q_map.__getitem__)
 
 

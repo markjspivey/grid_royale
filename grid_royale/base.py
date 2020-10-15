@@ -647,7 +647,7 @@ class State(_BaseGrid, gamey.State):
 
 
 
-class Culture(gamey.Culture):
+class Culture(gamey.ModelFreeLearningCulture):
 
     def __init__(self, n_players: int = 20, *, board_size: int = 20,
                  allow_shooting: bool = True, concurrent_food_tiles: int = 40,
@@ -665,7 +665,7 @@ class Culture(gamey.Culture):
                                player_id_to_strategy=dict(zip(LETTERS, self.strategies)))
 
 
-    def make_initial(self, *, concurrent_food_tiles: Optional[int] = None) -> State:
+    def make_initial_state(self, *, concurrent_food_tiles: Optional[int] = None) -> State:
         concurrent_food_tiles = (concurrent_food_tiles if concurrent_food_tiles is not None
                                  else self.default_concurrent_food_tiles)
         return State.make_initial(
@@ -793,21 +793,27 @@ from . import server
 
 @grid_royale.command()
 @click.option('--allow-shooting/--disallow-shooting', default=True)
+@click.option('--pre-train/--dont-pre-train', default=False)
 @click.option('--browser/--no-browser', 'open_browser', default=True)
 @click.option('--host', default=server.DEFAULT_HOST)
 @click.option('--port', default=server.DEFAULT_PORT)
 @click.option('--max-length', default=None, type=int)
-def play(*, allow_shooting: bool, open_browser: bool, host: str, port: str,
+def play(*, allow_shooting: bool, pre_train: bool, open_browser: bool, host: str, port: str,
          max_length: Optional[int] = None) -> None:
     with server.ServerThread(host=host, port=port, quiet=True) as server_thread:
         culture = Culture(allow_shooting=allow_shooting)
-        state = culture.make_initial()
+        state = culture.make_initial_state()
 
         if open_browser:
             print(f'Opening {server_thread.url} in your browser to view the game.')
             webbrowser.open_new(server_thread.url)
         else:
             print(f'Open {server_thread.url} in your browser to view the game.')
+
+        if pre_train:
+            print('Pre-training... ')
+            culture.multi_game_train()
+            print('Done pre-training.')
 
         if max_length is None:
             print(f'Calculating states in the simulation, press Ctrl-C to stop.')
